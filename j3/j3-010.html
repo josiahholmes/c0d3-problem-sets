@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pokemon Viewer</title>
+    <style>
+    #pokemonContainer {
+        margin-top: 30px;
+    }
+    </style>
+</head>
+<body>
+    <button id="previousPokemon">Previous</button>
+    <button id="nextPokemon">Next</button>
+    <div id="pokemonContainer"></div>
+</body>
+<script>
+let nextUrl = null;
+let previousUrl = null;
+let pokeList = [];
+
+const nextBtn = document.querySelector('#nextPokemon');
+const previousBtn = document.querySelector('#previousPokemon');
+const pokemonContainer = document.querySelector('#pokemonContainer');
+
+nextBtn.addEventListener('click', function () {
+    if (!nextUrl) return;
+    pokemonContainer.innerHTML = '';
+    fetchPokemon(nextUrl);
+});
+
+previousBtn.addEventListener('click', function () {
+    if (!previousUrl) return;
+    pokemonContainer.innerHTML = '';
+    fetchPokemon(previousUrl);
+});
+
+const displayPokemon = resp => {
+    pokemonContainer.innerHTML += `<div><h1>${resp.name}</h1>
+    <img src='${resp.sprites.front_default}' /></div>`
+}
+
+const fetchPokemon = (url = 'https://pokeapi.co/api/v2/pokemon/') => {
+    fetch(url).then(data => data.json()).then(resp => {
+        nextUrl = resp.next;
+        previousUrl = resp.previous;
+        resp.results.forEach(elem => {fetch(elem.url).then(
+            data => data.json()).then(data => displayPokemon(data))});
+    });
+}
+
+if (!previousUrl && !nextUrl) fetchPokemon()
+</script>
+</html>
